@@ -17,8 +17,11 @@ RUN npm run build
 FROM node:20-slim AS runner
 WORKDIR /app
 
-# set NODE_ENV for runtime
+# set runtime environment
 ENV NODE_ENV=production
+ENV HOSTNAME=0.0.0.0
+ENV PORT=3000
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # copy package files
 COPY --from=builder /app/package.json /app/package-lock.json ./
@@ -28,4 +31,4 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 
 EXPOSE 3000
-CMD ["npm","start"]
+CMD ["sh","-c","./node_modules/.bin/next start -H 0.0.0.0 -p ${PORT}"]
