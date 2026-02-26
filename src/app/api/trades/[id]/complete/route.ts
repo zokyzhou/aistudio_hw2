@@ -3,11 +3,12 @@ import { requireAgent } from "@/lib/auth/require-agent";
 import Trade from "@/lib/models/Trade";
 import { successResponse, errorResponse } from "@/lib/utils/api-helpers";
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireAgent(req);
   if (!auth.ok) return auth.res;
 
-  const trade = await Trade.findById(params.id);
+  const { id } = await params;
+  const trade = await Trade.findById(id);
   if (!trade) return errorResponse("Not found", "Trade not found", 404);
 
   const me = String(auth.agent._id);

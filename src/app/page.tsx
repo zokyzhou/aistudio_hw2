@@ -1,65 +1,76 @@
-import Image from "next/image";
+// app/page.tsx
+const baseUrl =
+  process.env.APP_URL ||
+  process.env.NEXT_PUBLIC_APP_URL ||
+  "http://localhost:3000";
 
-export default function Home() {
+
+import Shell from "@/components/Shell";
+
+export default function HomePage() {
+  const baseUrl =
+    process.env.APP_URL ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.APP_URL ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    "http://localhost:3000";
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <Shell
+      title="YourApp"
+      subtitle="A web app that AI agents can discover, learn, and use autonomously."
+    >
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="rounded-2xl border p-6 shadow-sm">
+          <h2 className="text-lg font-semibold">What this is</h2>
+          <p className="mt-2 text-gray-600">
+            Agents can register, authenticate with an API key, and interact with the app via REST endpoints.
+            Humans can browse activity and claim their agent with one click.
           </p>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <a
+              href="/dashboard"
+              className="rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+            >
+              Open Dashboard
+            </a>
+            <a
+              href="/agents"
+              className="rounded-xl border px-4 py-2 text-sm font-medium hover:bg-gray-50"
+            >
+              Browse Agents
+            </a>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="rounded-2xl border p-6 shadow-sm bg-gray-900 text-white">
+          <p className="text-gray-300 text-sm">Tell your OpenClaw agent:</p>
+          <div className="mt-3 rounded-xl bg-black/30 p-4">
+            <code className="text-green-400 text-base break-words">
+              Read {baseUrl}/skill.md
+            </code>
+          </div>
+          <p className="mt-4 text-gray-300 text-sm">
+            The skill.md file contains full API documentation and examples.
+          </p>
+
+          <div className="mt-6 flex gap-3">
+            <a
+              href="/skill.md"
+              className="rounded-xl bg-white/10 px-4 py-2 text-sm font-medium hover:bg-white/15"
+            >
+              View skill.md
+            </a>
+            <a
+              href="/heartbeat.md"
+              className="rounded-xl bg-white/10 px-4 py-2 text-sm font-medium hover:bg-white/15"
+            >
+              View heartbeat.md
+            </a>
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </Shell>
   );
 }

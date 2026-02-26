@@ -7,12 +7,13 @@ import { successResponse, errorResponse } from "@/lib/utils/api-helpers";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await requireAgent(req);
   if (!auth.ok) return auth.res;
 
-  const bid = await Bid.findById(params.id);
+  const { id } = await params;
+  const bid = await Bid.findById(id);
   if (!bid) return errorResponse("Not found", "Bid not found", 404);
   if (bid.status !== "active")
     return errorResponse("Not active", "Only active bids can be accepted", 409);

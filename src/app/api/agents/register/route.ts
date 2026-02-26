@@ -1,3 +1,8 @@
+const baseUrl =
+  process.env.APP_URL ||
+  process.env.NEXT_PUBLIC_APP_URL ||
+  "http://localhost:3000";
+  
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db/mongodb";
 import Agent from "@/lib/models/Agent";
@@ -20,6 +25,8 @@ export async function POST(req: NextRequest) {
   const claimToken = generateClaimToken();
 
   const baseUrl =
+    process.env.APP_URL ||
+    process.env.NEXT_PUBLIC_APP_URL ||
     process.env.APP_URL ||
     process.env.NEXT_PUBLIC_APP_URL ||
     "http://localhost:3000";

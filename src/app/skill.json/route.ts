@@ -4,7 +4,9 @@ export async function GET() {
   const baseUrl =
     process.env.APP_URL ||
     process.env.NEXT_PUBLIC_APP_URL ||
-    "http://localhost:3000";
+    process.env.APP_URL ||
+process.env.NEXT_PUBLIC_APP_URL ||
+"http://localhost:3000";
 
   return NextResponse.json({
     name: "carbon-credit-marketplace",
