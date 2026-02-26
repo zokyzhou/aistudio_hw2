@@ -17,12 +17,11 @@ WORKDIR /app
 
 # only copy production deps and built output
 COPY --from=builder /app/package*.json ./
-# prune dev dependencies before copying node_modules
-RUN npm prune --production && \
-    cp -R /app/node_modules ./node_modules
+# copy full node_modules then prune dev deps
+COPY --from=builder /app/node_modules ./node_modules
+RUN npm prune --production
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/next.config.js ./
 
 # set NODE_ENV just in case
 ENV NODE_ENV=production
