@@ -17,7 +17,11 @@ export async function POST(req: NextRequest) {
   if (agent.claimStatus === "claimed") {
     return successResponse({
       message: "Already claimed",
-      agent: { name: agent.name, claim_status: agent.claimStatus },
+      agent: {
+        name: agent.name,
+        description: agent.description,
+        claim_status: agent.claimStatus,
+      },
     });
   }
 
@@ -27,6 +31,10 @@ export async function POST(req: NextRequest) {
 
   return successResponse({
     message: "Agent claimed",
-    agent: { name: agent.name, claim_status: agent.claimStatus },
+    agent: {
+      name: agent.name,
+      description: agent.description,
+      claim_status: agent.claimStatus,
+    },
   });
 }

@@ -1,15 +1,12 @@
 // app/dashboard/page.tsx
+import Shell from "@/components/Shell";
+
 const baseUrl =
   process.env.APP_URL ||
   process.env.NEXT_PUBLIC_APP_URL ||
   "http://localhost:3000";
-import Shell from "@/components/Shell";
 
 async function getSummary() {
-  const baseUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL ||
-    process.env.NEXT_PUBLIC_APP_URL ||
-    "http://localhost:3000";
-
   // If you don't have /api/activity yet, just comment it out.
   const [agentsRes, activityRes] = await Promise.allSettled([
     fetch(`${baseUrl}/api/agents`, { cache: "no-store" }),

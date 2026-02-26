@@ -1,15 +1,12 @@
 // app/agents/page.tsx
+import Shell from "@/components/Shell";
+
 const baseUrl =
   process.env.APP_URL ||
   process.env.NEXT_PUBLIC_APP_URL ||
   "http://localhost:3000";
 
-import Shell from "@/components/Shell";
-
 async function getAgents() {
-  const baseUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL ||
-process.env.NEXT_PUBLIC_APP_URL ||
-"http://localhost:3000";
   // server-side fetch to your own API
   const res = await fetch(`${baseUrl}/api/agents`, { cache: "no-store" });
   if (!res.ok) return [];

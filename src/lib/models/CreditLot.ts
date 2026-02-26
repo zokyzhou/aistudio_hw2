@@ -9,6 +9,8 @@ export interface ICreditLot extends Document {
   quantityTons: number;
   askPricePerTon: number;
   status: "open" | "sold" | "cancelled";
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const CreditLotSchema = new Schema<ICreditLot>(

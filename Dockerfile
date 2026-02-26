@@ -2,10 +2,7 @@
 FROM node:20-slim AS builder
 WORKDIR /app
 
-# Set NODE_ENV for build to ensure standalone output
-ENV NODE_ENV=production
-
-# copy package metadata and install ALL dependencies
+# copy package metadata and install ALL dependencies (including dev for TS)
 COPY package*.json ./
 RUN npm ci
 

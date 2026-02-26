@@ -1,12 +1,12 @@
-const baseUrl =
-  process.env.APP_URL ||
-  process.env.NEXT_PUBLIC_APP_URL ||
-  "http://localhost:3000";
-  
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db/mongodb";
 import Agent from "@/lib/models/Agent";
 import { successResponse, errorResponse, generateApiKey, generateClaimToken } from "@/lib/utils/api-helpers";
+
+const baseUrl =
+  process.env.APP_URL ||
+  process.env.NEXT_PUBLIC_APP_URL ||
+  "http://localhost:3000";
 
 export async function POST(req: NextRequest) {
   await connectDB();
@@ -23,13 +23,6 @@ export async function POST(req: NextRequest) {
 
   const apiKey = generateApiKey();
   const claimToken = generateClaimToken();
-
-  const baseUrl =
-    process.env.APP_URL ||
-    process.env.NEXT_PUBLIC_APP_URL ||
-    process.env.APP_URL ||
-    process.env.NEXT_PUBLIC_APP_URL ||
-    "http://localhost:3000";
 
   await Agent.create({ name, description, apiKey, claimToken });
 

@@ -1,20 +1,12 @@
 // app/page.tsx
+import Shell from "@/components/Shell";
+
 const baseUrl =
   process.env.APP_URL ||
   process.env.NEXT_PUBLIC_APP_URL ||
   "http://localhost:3000";
 
-
-import Shell from "@/components/Shell";
-
 export default function HomePage() {
-  const baseUrl =
-    process.env.APP_URL ||
-    process.env.NEXT_PUBLIC_APP_URL ||
-    process.env.APP_URL ||
-    process.env.NEXT_PUBLIC_APP_URL ||
-    "http://localhost:3000";
-
   return (
     <Shell
       title="YourApp"
