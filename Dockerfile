@@ -1,14 +1,15 @@
 # production Dockerfile for the Next.js app
-# build stage
+# CRITICAL: Install ALL dependencies including dev (typescript required for next.config.ts)
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# copy package metadata and install all dependencies (including dev)
+# copy package metadata and install ALL dependencies
 COPY package*.json ./
 RUN npm ci
 
-# copy source and build
+# copy source and delete any old build artifacts
 COPY . .
+RUN rm -rf .next
 RUN npm run build
 
 # runtime stage
