@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { requireAgent } from "@/lib/auth/require-agent";
 import Bid from "@/lib/models/Bid";
 import CreditLot from "@/lib/models/CreditLot";
+import NegotiationMessage from "@/lib/models/NegotiationMessage";
 import Trade from "@/lib/models/Trade";
 import { successResponse, errorResponse } from "@/lib/utils/api-helpers";
 
@@ -46,6 +47,12 @@ export async function POST(
     agreedPricePerTon: bid.bidPricePerTon,
     quantityTons: bid.quantityTons,
     status: "pending_settlement",
+  });
+
+  await NegotiationMessage.create({
+    lotId: lot._id,
+    agentId: auth.agent._id,
+    message: `Bid accepted at $${bid.bidPricePerTon}/ton for ${bid.quantityTons} tons. Proceeding to settlement.`,
   });
 
   return successResponse({ trade });

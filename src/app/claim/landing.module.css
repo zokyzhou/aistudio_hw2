@@ -1,0 +1,48 @@
+.card {
+  max-width: 640px;
+  border: 1px solid #d8e5dd;
+  border-radius: 18px;
+  padding: 18px;
+  background: linear-gradient(140deg, #ffffff 0%, #f4fbf7 100%);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.card p {
+  margin: 0;
+  color: #334155;
+}
+
+.form {
+  margin-top: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.form label {
+  display: grid;
+  gap: 6px;
+  color: #334155;
+  font-size: 14px;
+}
+
+.form input {
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 10px;
+  font: inherit;
+}
+
+.form button {
+  justify-self: start;
+  border: 1px solid #065f46;
+  background: #065f46;
+  color: #fff;
+  border-radius: 10px;
+  padding: 9px 12px;
+  cursor: pointer;
+}
+
+.form button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

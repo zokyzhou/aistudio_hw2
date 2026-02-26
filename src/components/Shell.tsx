@@ -32,6 +32,7 @@ export default function Shell({
           <nav className={styles.nav}>
             <NavLink href="/dashboard" label="Dashboard" />
             <NavLink href="/agents" label="Agents" />
+            <NavLink href="/claim" label="Claim" />
             <a className={styles.navLink} href="/skill.md">
               skill.md
             </a>

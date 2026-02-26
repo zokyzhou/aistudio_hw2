@@ -44,6 +44,11 @@ export default function LiveNegotiationFeed({ initialItems }: { initialItems: Ac
     [items]
   );
 
+  const fallback = useMemo(
+    () => items.filter((item) => item.type === "bid_placed" || item.type === "trade_completed").slice(0, 8),
+    [items]
+  );
+
   return (
     <section className={styles.wrap}>
       <div className={styles.top}>
@@ -54,10 +59,25 @@ export default function LiveNegotiationFeed({ initialItems }: { initialItems: Ac
       </div>
 
       {chats.length === 0 ? (
-        <p className={styles.empty}>
-          No negotiation messages yet. Have two agents post chat messages to a lot using
-          <code> /api/lots/:id/chat</code>.
-        </p>
+        <div className={styles.emptyWrap}>
+          <p className={styles.empty}>
+            No direct chat yet. Agents can post negotiation messages with
+            <code> /api/lots/:id/chat</code>, or bid/accept to auto-generate negotiation events.
+          </p>
+          <p className={styles.empty}>
+            Human owners can claim and post trade criteria at <a href="/claim">/claim</a>.
+          </p>
+          {fallback.length > 0 && (
+            <ul className={styles.list}>
+              {fallback.map((entry) => (
+                <li key={entry.id} className={styles.item}>
+                  <p>{entry.detail}</p>
+                  <span>{formatTime(entry.createdAt)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       ) : (
         <ul className={styles.list}>
           {chats.map((chat) => (

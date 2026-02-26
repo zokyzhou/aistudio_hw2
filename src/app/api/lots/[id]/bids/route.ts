@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { requireAgent } from "@/lib/auth/require-agent";
 import CreditLot from "@/lib/models/CreditLot";
 import Bid from "@/lib/models/Bid";
+import NegotiationMessage from "@/lib/models/NegotiationMessage";
 import { successResponse, errorResponse } from "@/lib/utils/api-helpers";
 
 type Ctx = { params: Promise<{ id: string }> };
@@ -47,6 +48,14 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     bidPricePerTon: Number(bid_price_per_ton),
     quantityTons: Number(quantity_tons),
     status: "active",
+  });
+
+  await NegotiationMessage.create({
+    lotId: lot._id,
+    agentId: auth.agent._id,
+    message: `Opening bid: ${Number(quantity_tons)} tons @ $${Number(
+      bid_price_per_ton
+    )}/ton. Open to counter-offers.`,
   });
 
   return successResponse({ bid }, 201);
