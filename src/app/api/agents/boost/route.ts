@@ -11,6 +11,42 @@ function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+const qualityQuestions = [
+  "Can you confirm the latest issuance and verification status?",
+  "Any quality concerns around additionality or reversal buffer?",
+  "Is this lot currently clear on methodology and registry records?",
+];
+
+const qualityAnswers = [
+  "Verification is current and registry records are up to date.",
+  "No unresolved quality flags; docs and registry details are available.",
+  "Methodology and issuance records look clean on the registry side.",
+];
+
+const projectQuestions = [
+  "Can you share quick project context and co-benefits?",
+  "Before we settle, any project delivery notes we should know?",
+  "Can you confirm geography and current project operating status?",
+];
+
+const projectAnswers = [
+  "Project details and geography are consistent with listing disclosures.",
+  "Delivery and project context are unchanged from the listed information.",
+  "Geography, standard, and project scope are all aligned with the lot info.",
+];
+
+const buyerPushbacks = [
+  "We can move quickly if you can come down a bit on price.",
+  "We're close, but need a slightly tighter number to close today.",
+  "If we can narrow the spread, we can settle this round now.",
+];
+
+const sellerPushbacks = [
+  "Understood — we can improve terms a little, but not all the way to that level.",
+  "We can meet in the middle if you keep full volume.",
+  "That offer is close; a small step up and we can lock this.",
+];
+
 async function ensureNamedDemoAgents() {
   const buyerCandidate = await Agent.findOne({
     name: { $in: ["Zack", "Buyer Zack", "BuyerAgent1"] },
@@ -75,80 +111,112 @@ export async function POST() {
     });
   }
 
-  const bidPrice = Number((lot.askPricePerTon - 0.3).toFixed(2));
-
-  const sellerBenchmark = await HumanDisclosure.findOne({
-    agentId: seller._id,
-    postType: "sold_disclosure",
-  })
+  const sellerBenchmark = await HumanDisclosure.findOne({ agentId: seller._id, postType: "sold_disclosure" })
+    .sort({ createdAt: -1 })
+    .lean();
+  const buyerBenchmark = await HumanDisclosure.findOne({ agentId: buyer._id, postType: "buy_criteria" })
     .sort({ createdAt: -1 })
     .lean();
 
-  const buyerBenchmark = await HumanDisclosure.findOne({
-    agentId: buyer._id,
-    postType: "buy_criteria",
-  })
-    .sort({ createdAt: -1 })
+  const roundMessages = await NegotiationMessage.find({ lotId: lot._id })
+    .sort({ createdAt: 1 })
+    .select("agentId")
     .lean();
+  const step = roundMessages.length % 6;
 
-  const bid = await Bid.create({
+  let activeBid = await Bid.findOne({
     lotId: lot._id,
     buyerAgentId: buyer._id,
-    bidPricePerTon: bidPrice,
-    quantityTons: lot.quantityTons,
     status: "active",
-  });
+  }).sort({ createdAt: -1 });
 
-  await NegotiationMessage.insertMany([
-    {
+  let createdTrade: any = null;
+  let createdBid: any = null;
+  let generatedMessage = "";
+
+  if (step === 0) {
+    generatedMessage = `${pick(qualityQuestions)} Lot references ${lot.standard} ${lot.vintageYear} in ${lot.geography}.`;
+    await NegotiationMessage.create({ lotId: lot._id, agentId: buyer._id, message: generatedMessage });
+  } else if (step === 1) {
+    generatedMessage = `${pick(qualityAnswers)} Project ${lot.projectName} is listed for ${lot.quantityTons} tons.`;
+    await NegotiationMessage.create({ lotId: lot._id, agentId: seller._id, message: generatedMessage });
+  } else if (step === 2) {
+    const firstBidPrice = Number((lot.askPricePerTon - 0.9).toFixed(2));
+    activeBid = await Bid.create({
       lotId: lot._id,
-      agentId: buyer._id,
-      message: `As buyer, I need quality confirmation: standard ${lot.standard}, vintage ${lot.vintageYear}, geography ${lot.geography}.`,
-    },
-    {
+      buyerAgentId: buyer._id,
+      bidPricePerTon: firstBidPrice,
+      quantityTons: lot.quantityTons,
+      status: "active",
+    });
+    createdBid = activeBid;
+    generatedMessage = `${pick(projectQuestions)} We can open at $${firstBidPrice}/ton for ${lot.quantityTons} tons.${
+      buyerBenchmark?.benchmarkPricePerTon
+        ? ` Our latest benchmark is near $${buyerBenchmark.benchmarkPricePerTon}/ton.`
+        : ""
+    }`;
+    await NegotiationMessage.create({ lotId: lot._id, agentId: buyer._id, message: generatedMessage });
+  } else if (step === 3) {
+    const counterPrice = Number((lot.askPricePerTon - 0.4).toFixed(2));
+    generatedMessage = `${pick(sellerPushbacks)} We can consider $${counterPrice}/ton as a workable level.`;
+    await NegotiationMessage.create({ lotId: lot._id, agentId: seller._id, message: generatedMessage });
+  } else if (step === 4) {
+    const improvedBidPrice = Number((lot.askPricePerTon - 0.25).toFixed(2));
+    if (activeBid) {
+      activeBid.bidPricePerTon = improvedBidPrice;
+      await activeBid.save();
+      createdBid = activeBid;
+    } else {
+      activeBid = await Bid.create({
+        lotId: lot._id,
+        buyerAgentId: buyer._id,
+        bidPricePerTon: improvedBidPrice,
+        quantityTons: lot.quantityTons,
+        status: "active",
+      });
+      createdBid = activeBid;
+    }
+    generatedMessage = `${pick(buyerPushbacks)} Updated bid: $${improvedBidPrice}/ton for full ${lot.quantityTons} tons.`;
+    await NegotiationMessage.create({ lotId: lot._id, agentId: buyer._id, message: generatedMessage });
+  } else {
+    const finalBid =
+      activeBid ||
+      (await Bid.create({
+        lotId: lot._id,
+        buyerAgentId: buyer._id,
+        bidPricePerTon: Number((lot.askPricePerTon - 0.2).toFixed(2)),
+        quantityTons: lot.quantityTons,
+        status: "active",
+      }));
+
+    finalBid.status = "accepted";
+    await finalBid.save();
+    createdBid = finalBid;
+
+    await Bid.updateMany(
+      { lotId: lot._id, _id: { $ne: finalBid._id }, status: "active" },
+      { $set: { status: "rejected" } }
+    );
+
+    lot.status = "sold";
+    await lot.save();
+
+    createdTrade = await Trade.create({
       lotId: lot._id,
-      agentId: seller._id,
-      message: `As seller, project info: ${lot.projectName} (${lot.standard} ${lot.vintageYear}) in ${lot.geography}, quantity ${lot.quantityTons} tons.`,
-    },
-    {
-      lotId: lot._id,
-      agentId: buyer._id,
-      message: `Price inquiry from buyer: ask is $${lot.askPricePerTon}/ton. My bid is $${bidPrice}/ton for ${lot.quantityTons} tons.${
-        buyerBenchmark?.benchmarkPricePerTon
-          ? ` Buyer benchmark: $${buyerBenchmark.benchmarkPricePerTon}/ton on ${buyerBenchmark.benchmarkMarketplace}.`
-          : ""
-      }`,
-    },
-    {
-      lotId: lot._id,
-      agentId: seller._id,
-      message: `Seller response: accepted at $${bidPrice}/ton for ${lot.quantityTons} tons. ${
-        sellerBenchmark?.benchmarkPricePerTon
-          ? `Seller benchmark was $${sellerBenchmark.benchmarkPricePerTon}/ton on ${sellerBenchmark.benchmarkMarketplace}.`
-          : "Proceeding with current project valuation context."
-      }`,
-    },
-  ]);
+      buyerAgentId: buyer._id,
+      sellerAgentId: seller._id,
+      agreedPricePerTon: finalBid.bidPricePerTon,
+      quantityTons: lot.quantityTons,
+      status: "completed",
+    });
 
-  bid.status = "accepted";
-  await bid.save();
-
-  await Bid.updateMany(
-    { lotId: lot._id, _id: { $ne: bid._id }, status: "active" },
-    { $set: { status: "rejected" } }
-  );
-
-  lot.status = "sold";
-  await lot.save();
-
-  const trade = await Trade.create({
-    lotId: lot._id,
-    buyerAgentId: buyer._id,
-    sellerAgentId: seller._id,
-    agreedPricePerTon: bidPrice,
-    quantityTons: lot.quantityTons,
-    status: "completed",
-  });
+    generatedMessage = `Deal confirmed at $${finalBid.bidPricePerTon}/ton for ${lot.quantityTons} tons.${
+      sellerBenchmark?.benchmarkPricePerTon
+        ? ` Seller benchmark reference was $${sellerBenchmark.benchmarkPricePerTon}/ton on ${sellerBenchmark.benchmarkMarketplace}.`
+        : ""
+    }`;
+    await NegotiationMessage.create({ lotId: lot._id, agentId: seller._id, message: generatedMessage });
+  }
 
   seller.lastActive = new Date();
   buyer.lastActive = new Date();
@@ -159,10 +227,10 @@ export async function POST() {
       seller: seller.name,
       buyer: buyer.name,
       lot_id: String(lot._id),
-      bid_id: String(bid._id),
-      trade_id: String(trade._id),
-      agreed_price_per_ton: bidPrice,
-      quantity_tons: lot.quantityTons,
+      bid_id: createdBid ? String(createdBid._id) : null,
+      trade_id: createdTrade ? String(createdTrade._id) : null,
+      message: generatedMessage,
+      step,
     },
   });
 }

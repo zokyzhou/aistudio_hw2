@@ -42,7 +42,7 @@ export default function AgentConversationView() {
       await fetch("/api/agents/boost", { method: "POST" });
       await refresh();
       setAutoStatus("Auto round completed");
-      window.setTimeout(() => setAutoStatus("Auto mode active"), 1800);
+      window.setTimeout(() => setAutoStatus("Auto mode active (30–60s cadence)"), 1800);
     } finally {
       // no-op
     }
@@ -52,11 +52,21 @@ export default function AgentConversationView() {
     refresh();
 
     const refreshTimer = window.setInterval(refresh, 5000);
-    const autoBoostTimer = window.setInterval(boostRound, 18000);
+    let autoBoostTimer: number | null = null;
+
+    const scheduleBoost = () => {
+      const delay = 30000 + Math.floor(Math.random() * 30000);
+      autoBoostTimer = window.setTimeout(async () => {
+        await boostRound();
+        scheduleBoost();
+      }, delay);
+    };
+
+    scheduleBoost();
 
     return () => {
       window.clearInterval(refreshTimer);
-      window.clearInterval(autoBoostTimer);
+      if (autoBoostTimer) window.clearTimeout(autoBoostTimer);
     };
   }, []);
 
@@ -66,13 +76,27 @@ export default function AgentConversationView() {
       if (!map.has(message.lot_id)) map.set(message.lot_id, []);
       map.get(message.lot_id)!.push(message);
     }
-    return Array.from(map.entries()).map(([lotId, rows]) => ({
-      lotId,
-      lotName: rows[0]?.lot_name || "Unknown lot",
-      ask: rows[0]?.lot_ask_price_per_ton,
-      qty: rows[0]?.lot_quantity_tons,
-      rows,
-    }));
+
+    return Array.from(map.entries())
+      .map(([lotId, rows]) => {
+        const sortedRows = [...rows].sort(
+          (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+        const latestTs = sortedRows.length
+          ? new Date(sortedRows[sortedRows.length - 1].createdAt).getTime()
+          : 0;
+
+        return {
+          lotId,
+          lotName: sortedRows[0]?.lot_name || "Unknown lot",
+          ask: sortedRows[0]?.lot_ask_price_per_ton,
+          qty: sortedRows[0]?.lot_quantity_tons,
+          latestTs,
+          rows: sortedRows.slice(-4),
+        };
+      })
+      .sort((a, b) => b.latestTs - a.latestTs)
+      .slice(0, 3);
   }, [messages]);
 
   return (
@@ -80,7 +104,7 @@ export default function AgentConversationView() {
       <div className={styles.top}>
         <div>
           <h2>Agent Conversation Room</h2>
-          <p>Live inquiries on quality, project details, and price negotiation. {autoStatus}.</p>
+          <p>Latest negotiation previews only. {autoStatus}.</p>
         </div>
       </div>
 
@@ -105,9 +129,7 @@ export default function AgentConversationView() {
                 {group.rows.map((message) => (
                   <li key={message.id} className={styles.messageItem}>
                     <div className={styles.rowTop}>
-                      <strong>
-                        {message.agent_name} <span className={styles.role}>({message.agent_role})</span>
-                      </strong>
+                      <strong>{message.agent_name}</strong>
                       <span className={styles.tag}>{message.tag}</span>
                     </div>
                     <p>{message.message}</p>

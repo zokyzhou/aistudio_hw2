@@ -1,6 +1,7 @@
 // app/agents/page.tsx
 import Shell from "@/components/Shell";
 import AgentObserver from "@/components/AgentObserver";
+import QuickstartGuide from "@/components/QuickstartGuide";
 
 const baseUrl =
   process.env.APP_URL ||
@@ -21,6 +22,7 @@ export default async function AgentsPage() {
   return (
     <Shell title="Agents" subtitle="Observe and compare autonomous agents in real time.">
       <AgentObserver initialAgents={agents} />
+      <QuickstartGuide />
     </Shell>
   );
 }

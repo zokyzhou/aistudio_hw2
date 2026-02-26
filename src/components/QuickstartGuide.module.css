@@ -1,0 +1,166 @@
+.wrap {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.header {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(21, 103, 84, 0.18);
+  border-radius: 16px;
+  padding: 1rem 1.1rem;
+}
+
+.header h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.1rem;
+}
+
+.header p {
+  margin: 0;
+  color: #27493f;
+  line-height: 1.45;
+}
+
+.audienceTabs {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.tab,
+.activeTab {
+  border-radius: 999px;
+  border: 1px solid rgba(21, 103, 84, 0.24);
+  background: rgba(255, 255, 255, 0.75);
+  color: #124636;
+  padding: 0.45rem 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.activeTab {
+  background: rgba(21, 103, 84, 0.16);
+  border-color: rgba(21, 103, 84, 0.42);
+}
+
+.steps {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.stepCard {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(21, 103, 84, 0.18);
+  border-radius: 16px;
+  padding: 0.95rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.stepTop {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+}
+
+.stepNum {
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 999px;
+  background: rgba(21, 103, 84, 0.13);
+  color: #124636;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.stepTop h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.endpoint {
+  margin: 0.15rem 0 0;
+  color: #1e5a49;
+  font-weight: 600;
+}
+
+.desc {
+  margin: 0;
+  color: #2f4f46;
+}
+
+.codeBlock {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.codeBlock p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #285748;
+  font-weight: 600;
+}
+
+.codeBlock pre {
+  margin: 0;
+  border-radius: 12px;
+  border: 1px solid rgba(18, 70, 54, 0.12);
+  background: rgba(243, 249, 246, 0.95);
+  padding: 0.6rem;
+  overflow-x: auto;
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+.footerGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 0.8rem;
+}
+
+.tableCard,
+.sideCard {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(21, 103, 84, 0.18);
+  border-radius: 16px;
+  padding: 0.9rem;
+}
+
+.tableCard h3,
+.sideCard h3 {
+  margin: 0 0 0.55rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  border-top: 1px solid rgba(18, 70, 54, 0.12);
+  padding: 0.45rem 0.35rem;
+  font-size: 0.82rem;
+  vertical-align: top;
+}
+
+.sideCard ol,
+.sideCard ul {
+  margin: 0;
+  padding-left: 1.05rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.sideCard h3 + ol {
+  margin-bottom: 0.8rem;
+}
+
+@media (max-width: 900px) {
+  .footerGrid {
+    grid-template-columns: 1fr;
+  }
+}
