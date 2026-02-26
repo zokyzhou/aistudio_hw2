@@ -1,11 +1,13 @@
 # production Dockerfile for the Next.js app
-# CRITICAL: Install ALL dependencies including dev (typescript required for next.config.ts)
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 WORKDIR /app
+
+# Set NODE_ENV for build to ensure standalone output
+ENV NODE_ENV=production
 
 # copy package metadata and install ALL dependencies
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --omit=dev
 
 # copy source and delete any old build artifacts
 COPY . .
@@ -15,15 +17,15 @@ ENV MONGODB_URI=mongodb://localhost:27017/build-placeholder
 RUN npm run build
 
 # runtime stage
-FROM node:20-alpine AS runner
+FROM node:20-slim AS runner
 WORKDIR /app
 
 # set NODE_ENV just in case
 ENV NODE_ENV=production
 
-# copy standalone output (includes server.js and minimal dependencies)
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+# copy standalone output with entire structure
+COPY --from=builder /app/.next/standalone/my-agent-app/ ./
+# copy public assets  
 COPY --from=builder /app/public ./public
 
 EXPOSE 3000
