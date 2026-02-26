@@ -4,6 +4,47 @@ import Bid from "@/lib/models/Bid";
 import Agent from "@/lib/models/Agent";
 import { successResponse } from "@/lib/utils/api-helpers";
 
+const LEGIT_STANDARDS = [
+  "verra",
+  "vcs",
+  "gold standard",
+  "acr",
+  "american carbon registry",
+  "car",
+  "climate action reserve",
+];
+
+function isLegitLot(input: {
+  projectName: unknown;
+  standard: unknown;
+  vintageYear: unknown;
+  geography: unknown;
+  quantityTons: unknown;
+  askPricePerTon: unknown;
+  sellerName: unknown;
+}) {
+  const projectName = String(input.projectName || "").trim();
+  const standard = String(input.standard || "").trim().toLowerCase();
+  const geography = String(input.geography || "").trim();
+  const sellerName = String(input.sellerName || "").trim();
+  const vintageYear = Number(input.vintageYear);
+  const quantityTons = Number(input.quantityTons);
+  const askPricePerTon = Number(input.askPricePerTon);
+  const currentYear = new Date().getFullYear();
+
+  const standardAllowed = LEGIT_STANDARDS.some((item) => standard.includes(item));
+
+  if (!projectName || projectName.length < 3) return false;
+  if (!standardAllowed) return false;
+  if (!Number.isFinite(vintageYear) || vintageYear < 2005 || vintageYear > currentYear) return false;
+  if (!geography || geography.length < 2) return false;
+  if (!Number.isFinite(quantityTons) || quantityTons <= 0) return false;
+  if (!Number.isFinite(askPricePerTon) || askPricePerTon <= 0) return false;
+  if (!sellerName || sellerName.toLowerCase() === "unknown seller") return false;
+
+  return true;
+}
+
 export async function GET() {
   await connectDB();
 
@@ -33,13 +74,16 @@ export async function GET() {
   const sellerMap = new Map(sellers.map((s) => [String(s._id), s.name]));
   const bidMap = new Map(bidAgg.map((b) => [String(b._id), b]));
 
-  const credits = lots.map((lot) => {
+  const credits = lots
+    .map((lot) => {
     const bid = bidMap.get(String(lot._id));
     const query = encodeURIComponent(`${lot.projectName} ${lot.standard} carbon credit project`);
     const standardLower = String(lot.standard || "").toLowerCase();
     const referenceMarket = standardLower.includes("gold")
       ? "https://registry.goldstandard.org/"
       : "https://registry.verra.org/";
+
+    const sellerName = sellerMap.get(String(lot.sellerAgentId)) || "Unknown seller";
 
     return {
       id: String(lot._id),
@@ -50,7 +94,7 @@ export async function GET() {
       quantity_tons: lot.quantityTons,
       ask_price_per_ton: lot.askPricePerTon,
       status: lot.status,
-      seller_name: sellerMap.get(String(lot.sellerAgentId)) || "Unknown seller",
+      seller_name: sellerName,
       bids_count: bid?.bidsCount || 0,
       top_bid: bid?.topBid ?? null,
       links: {
@@ -58,7 +102,18 @@ export async function GET() {
         reference_market: referenceMarket,
       },
     };
-  });
+  })
+    .filter((credit) =>
+      isLegitLot({
+        projectName: credit.project_name,
+        standard: credit.standard,
+        vintageYear: credit.vintage_year,
+        geography: credit.geography,
+        quantityTons: credit.quantity_tons,
+        askPricePerTon: credit.ask_price_per_ton,
+        sellerName: credit.seller_name,
+      })
+    );
 
   return successResponse({ credits });
 }
