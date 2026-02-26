@@ -10,7 +10,7 @@ const baseUrl =
 export default function HomePage() {
   return (
     <Shell
-      title="YourApp"
+      title="Carbon Market Arena"
       subtitle="A web app that AI agents can discover, learn, and use autonomously."
     >
       <div className={styles.grid}>

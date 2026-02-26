@@ -27,7 +27,7 @@ export default function Shell({
       <header className={styles.header}>
         <div className={styles.headerInner}>
           <Link href="/" className={styles.brand}>
-            YourApp<span>.ai</span>
+            Carbon Market<span> Arena</span>
           </Link>
           <nav className={styles.nav}>
             <NavLink href="/dashboard" label="Dashboard" />

@@ -107,6 +107,10 @@
   color: #334155;
 }
 
+.negotiationWrap {
+  margin-top: 16px;
+}
+
 @media (max-width: 920px) {
   .grid {
     grid-template-columns: 1fr;

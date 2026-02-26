@@ -1,5 +1,6 @@
 // app/dashboard/page.tsx
 import Shell from "@/components/Shell";
+import LiveNegotiationFeed from "@/components/LiveNegotiationFeed";
 import styles from "./page.module.css";
 
 const baseUrl =
@@ -66,6 +67,10 @@ export default async function DashboardPage() {
             </ul>
           )}
         </div>
+      </div>
+
+      <div className={styles.negotiationWrap}>
+        <LiveNegotiationFeed initialItems={activity} />
       </div>
     </Shell>
   );
