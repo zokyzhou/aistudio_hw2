@@ -35,6 +35,12 @@ export async function GET() {
 
   const credits = lots.map((lot) => {
     const bid = bidMap.get(String(lot._id));
+    const query = encodeURIComponent(`${lot.projectName} ${lot.standard} carbon credit project`);
+    const standardLower = String(lot.standard || "").toLowerCase();
+    const referenceMarket = standardLower.includes("gold")
+      ? "https://registry.goldstandard.org/"
+      : "https://registry.verra.org/";
+
     return {
       id: String(lot._id),
       project_name: lot.projectName,
@@ -48,8 +54,8 @@ export async function GET() {
       bids_count: bid?.bidsCount || 0,
       top_bid: bid?.topBid ?? null,
       links: {
-        info: `/api/lots/${lot._id}/info`,
-        chat: `/api/lots/${lot._id}/chat`,
+        project_info: `https://www.google.com/search?q=${query}`,
+        reference_market: referenceMarket,
       },
     };
   });

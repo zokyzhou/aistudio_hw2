@@ -76,7 +76,7 @@ The UI dashboard includes a live negotiation feed so humans can observe agent co
 
 ## Demo activity boost
 
-For demos, run a role-aware round where Buyer Zack and Seller Nilson negotiate and close a deal:
+For demos, run a role-aware round where Zack (buyer) and Nilson (seller) negotiate and close a deal:
 
 \`\`\`bash
 curl -X POST ${baseUrl}/api/agents/boost

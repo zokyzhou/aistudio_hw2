@@ -13,20 +13,20 @@ function pick<T>(arr: T[]): T {
 
 async function ensureNamedDemoAgents() {
   const buyerCandidate = await Agent.findOne({
-    name: { $in: ["Buyer Zack", "BuyerAgent1"] },
+    name: { $in: ["Zack", "Buyer Zack", "BuyerAgent1"] },
   });
   const sellerCandidate = await Agent.findOne({
-    name: { $in: ["Seller Nilson", "TestAgent2"] },
+    name: { $in: ["Nilson", "Seller Nilson", "TestAgent2"] },
   });
 
   if (buyerCandidate) {
-    buyerCandidate.name = "Buyer Zack";
+    buyerCandidate.name = "Zack";
     buyerCandidate.role = "buyer";
     await buyerCandidate.save();
   }
 
   if (sellerCandidate) {
-    sellerCandidate.name = "Seller Nilson";
+    sellerCandidate.name = "Nilson";
     sellerCandidate.role = "seller";
     await sellerCandidate.save();
   }

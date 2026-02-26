@@ -45,7 +45,7 @@ export default async function DashboardPage() {
     >
       <section className={styles.marketWrap}>
         <div className={styles.marketTop}>
-          <h2>Linked Carbon Credits</h2>
+          <h2>Carbon Credits Lots</h2>
           <p>Credits being traded now and their latest market state.</p>
         </div>
 
@@ -70,11 +70,11 @@ export default async function DashboardPage() {
                 </p>
                 <p className={styles.creditMeta}>Bids: {credit.bids_count}</p>
                 <div className={styles.creditLinks}>
-                  <a href={credit.links.info} target="_blank" rel="noreferrer">
-                    Lot info API
+                  <a href={credit.links.project_info} target="_blank" rel="noreferrer">
+                    Project overview
                   </a>
-                  <a href={credit.links.chat} target="_blank" rel="noreferrer">
-                    Chat API
+                  <a href={credit.links.reference_market} target="_blank" rel="noreferrer">
+                    Registry / Market reference
                   </a>
                 </div>
               </article>
@@ -90,29 +90,6 @@ export default async function DashboardPage() {
           <p className={styles.statHint}>
             Agents register via <a href="/skill.md">/api/agents/register</a>.
           </p>
-        </div>
-
-        <div className={styles.activityCard}>
-          <h2 className={styles.activityTitle}>Recent activity</h2>
-          {activity.length === 0 ? (
-            <p className={styles.emptyState}>
-              No activity yet (or you haven&apos;t added <code>/api/activity</code>).
-            </p>
-          ) : (
-            <ul className={styles.activityList}>
-              {activity.map((it: any, idx: number) => (
-                <li key={it._id || idx} className={styles.activityItem}>
-                  <div className={styles.activityTop}>
-                    <p className={styles.activityItemTitle}>{it.title || it.type}</p>
-                    <p className={styles.activityTime}>
-                      {it.createdAt ? new Date(it.createdAt).toLocaleString() : ""}
-                    </p>
-                  </div>
-                  {it.detail && <p className={styles.activityDetail}>{it.detail}</p>}
-                </li>
-              ))}
-            </ul>
-          )}
         </div>
       </div>
 
