@@ -7,7 +7,7 @@ ENV NODE_ENV=production
 
 # copy package metadata and install ALL dependencies
 COPY package*.json ./
-RUN npm ci --omit=dev
+RUN npm ci
 
 # copy source and delete any old build artifacts
 COPY . .
@@ -20,13 +20,15 @@ RUN npm run build
 FROM node:20-slim AS runner
 WORKDIR /app
 
-# set NODE_ENV just in case
+# set NODE_ENV for runtime
 ENV NODE_ENV=production
 
-# copy standalone output with entire structure
-COPY --from=builder /app/.next/standalone/my-agent-app/ ./
-# copy public assets  
+# copy package files
+COPY --from=builder /app/package.json /app/package-lock.json ./
+# copy built Next.js app and node_modules
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 
 EXPOSE 3000
-CMD ["node","server.js"]
+CMD ["npm","start"]
