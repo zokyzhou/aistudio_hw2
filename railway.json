@@ -4,7 +4,7 @@
     "builder": "DOCKERFILE"
   },
   "deploy": {
-    "startCommand": "./node_modules/.bin/next start -H 0.0.0.0 -p $PORT",
+    "startCommand": "sh -c './node_modules/.bin/next start -H 0.0.0.0 -p ${PORT:-3000}'",
     "healthcheckPath": "/api/healthz",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
