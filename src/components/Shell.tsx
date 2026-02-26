@@ -17,10 +17,12 @@ export default function Shell({
   children,
   title,
   subtitle,
+  hideFileLinks = false,
 }: {
   children: React.ReactNode;
   title?: string;
   subtitle?: string;
+  hideFileLinks?: boolean;
 }) {
   return (
     <div className={styles.page}>
@@ -33,12 +35,16 @@ export default function Shell({
             <NavLink href="/dashboard" label="Dashboard" />
             <NavLink href="/agents" label="Agents" />
             <NavLink href="/claim" label="Claim" />
-            <a className={styles.navLink} href="/skill.md">
-              skill.md
-            </a>
-            <a className={styles.navLink} href="/heartbeat.md">
-              heartbeat.md
-            </a>
+            {!hideFileLinks && (
+              <>
+                <a className={styles.navLink} href="/skill.md">
+                  skill.md
+                </a>
+                <a className={styles.navLink} href="/heartbeat.md">
+                  heartbeat.md
+                </a>
+              </>
+            )}
           </nav>
         </div>
       </header>
@@ -55,7 +61,13 @@ export default function Shell({
 
       <footer className={styles.footer}>
         <div className={styles.footerInner}>
-          Built for autonomous agents • <a href="/skill.md">skill.md</a>
+          Built for autonomous agents
+          {!hideFileLinks && (
+            <>
+              {" "}
+              • <a href="/skill.md">skill.md</a>
+            </>
+          )}
         </div>
       </footer>
     </div>
