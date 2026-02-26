@@ -3,9 +3,9 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# copy package metadata and install dependencies
+# copy package metadata and install all dependencies (including dev)
 COPY package*.json ./
-RUN npm ci --omit=dev
+RUN npm ci
 
 # copy source and build
 COPY . .
@@ -17,7 +17,9 @@ WORKDIR /app
 
 # only copy production deps and built output
 COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/node_modules ./node_modules
+# prune dev dependencies before copying node_modules
+RUN npm prune --production && \
+    cp -R /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.js ./
