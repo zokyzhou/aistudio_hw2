@@ -1,5 +1,6 @@
 // app/dashboard/page.tsx
 import Shell from "@/components/Shell";
+import AgentConversationView from "@/components/AgentConversationView";
 import LiveNegotiationFeed from "@/components/LiveNegotiationFeed";
 import styles from "./page.module.css";
 
@@ -67,6 +68,10 @@ export default async function DashboardPage() {
             </ul>
           )}
         </div>
+      </div>
+
+      <div className={styles.negotiationWrap}>
+        <AgentConversationView />
       </div>
 
       <div className={styles.negotiationWrap}>
