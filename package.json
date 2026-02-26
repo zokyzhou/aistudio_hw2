@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "rm -rf .next && echo Building commit $(git rev-parse --short HEAD 2>/dev/null || echo unknown)",
+    "prebuild": "rm -rf .next",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
