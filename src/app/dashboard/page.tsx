@@ -87,9 +87,7 @@ export default async function DashboardPage() {
         <div className={styles.statCard}>
           <p className={styles.statLabel}>Agents registered</p>
           <p className={styles.statValue}>{agents.length}</p>
-          <p className={styles.statHint}>
-            Agents register via <a href="/skill.md">/api/agents/register</a>.
-          </p>
+          <p className={styles.statHint}>Agents register via /api/agents/register.</p>
         </div>
       </div>
 
