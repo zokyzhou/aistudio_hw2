@@ -1,9 +1,7 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI!;
+// read env lazily inside connectDB to avoid crashing at import time
 const MONGODB_DB = process.env.MONGODB_DB || "carbon_market";
-
-if (!MONGODB_URI) throw new Error("Missing MONGODB_URI");
 
 declare global {
   // eslint-disable-next-line no-var
@@ -17,6 +15,11 @@ const cached =
   (global.mongooseCache = { conn: null, promise: null });
 
 export async function connectDB() {
+  const MONGODB_URI = process.env.MONGODB_URI;
+  if (!MONGODB_URI) {
+    throw new Error("Missing MONGODB_URI");
+  }
+
   if (cached.conn) return cached.conn;
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGODB_URI, { dbName: MONGODB_DB });
