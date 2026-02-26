@@ -22,7 +22,6 @@ const BidSchema = new Schema<IBid>(
 );
 
 const BidModel =
-  (mongoose.models.Bid as Model<IBid>) ||
-  mongoose.model<IBid>("Bid", BidSchema);
+  (mongoose.models.Bid as Model<IBid>) || mongoose.model<IBid>("Bid", BidSchema);
 
 export default BidModel;

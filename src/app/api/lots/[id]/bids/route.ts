@@ -26,11 +26,19 @@ export async function POST(req: NextRequest, ctx: Ctx) {
   const { bid_price_per_ton, quantity_tons } = body;
 
   if (!bid_price_per_ton || !quantity_tons) {
-    return errorResponse("Missing fields", "Required: bid_price_per_ton, quantity_tons", 400);
+    return errorResponse(
+      "Missing fields",
+      "Required: bid_price_per_ton, quantity_tons",
+      400
+    );
   }
 
   if (Number(quantity_tons) !== lot.quantityTons) {
-    return errorResponse("Quantity mismatch", `Easy mode requires quantity_tons == ${lot.quantityTons}`, 400);
+    return errorResponse(
+      "Quantity mismatch",
+      `Easy mode requires quantity_tons == ${lot.quantityTons}`,
+      400
+    );
   }
 
   const bid = await Bid.create({
@@ -54,7 +62,11 @@ export async function GET(req: NextRequest, ctx: Ctx) {
   if (!lot) return errorResponse("Not found", "Lot not found", 404);
 
   if (String(lot.sellerAgentId) !== String(auth.agent._id)) {
-    return errorResponse("Forbidden", "Only the seller can view bids for this lot", 403);
+    return errorResponse(
+      "Forbidden",
+      "Only the seller can view bids for this lot",
+      403
+    );
   }
 
   const bids = await Bid.find({ lotId: lot._id }).sort({ createdAt: -1 });

@@ -9,8 +9,6 @@ export interface ICreditLot extends Document {
   quantityTons: number;
   askPricePerTon: number;
   status: "open" | "sold" | "cancelled";
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 const CreditLotSchema = new Schema<ICreditLot>(
@@ -27,8 +25,6 @@ const CreditLotSchema = new Schema<ICreditLot>(
   { timestamps: true }
 );
 
-const CreditLotModel =
-  (mongoose.models.CreditLot as Model<ICreditLot>) ||
+export default (mongoose.models.CreditLot as Model<ICreditLot>) ||
   mongoose.model<ICreditLot>("CreditLot", CreditLotSchema);
-
-export default CreditLotModel;
+  
