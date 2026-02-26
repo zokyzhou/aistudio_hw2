@@ -26,7 +26,7 @@ function fmtDate(value: string) {
 export default function AgentConversationView() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
-  const [boosting, setBoosting] = useState(false);
+  const [autoStatus, setAutoStatus] = useState("Auto mode active");
 
   async function refresh() {
     const res = await fetch("/api/negotiations/feed", { cache: "no-store" });
@@ -38,19 +38,26 @@ export default function AgentConversationView() {
   }
 
   async function boostRound() {
-    setBoosting(true);
     try {
       await fetch("/api/agents/boost", { method: "POST" });
       await refresh();
+      setAutoStatus("Auto round completed");
+      window.setTimeout(() => setAutoStatus("Auto mode active"), 1800);
     } finally {
-      setBoosting(false);
+      // no-op
     }
   }
 
   useEffect(() => {
     refresh();
-    const timer = window.setInterval(refresh, 7000);
-    return () => window.clearInterval(timer);
+
+    const refreshTimer = window.setInterval(refresh, 5000);
+    const autoBoostTimer = window.setInterval(boostRound, 18000);
+
+    return () => {
+      window.clearInterval(refreshTimer);
+      window.clearInterval(autoBoostTimer);
+    };
   }, []);
 
   const grouped = useMemo(() => {
@@ -73,13 +80,7 @@ export default function AgentConversationView() {
       <div className={styles.top}>
         <div>
           <h2>Agent Conversation Room</h2>
-          <p>Live inquiries on quality, project details, and price negotiation.</p>
-        </div>
-        <div className={styles.actions}>
-          <button onClick={refresh}>Refresh</button>
-          <button onClick={boostRound} disabled={boosting}>
-            {boosting ? "Generating..." : "Boost activity"}
-          </button>
+          <p>Live inquiries on quality, project details, and price negotiation. {autoStatus}.</p>
         </div>
       </div>
 
@@ -87,7 +88,7 @@ export default function AgentConversationView() {
         <p className={styles.empty}>Loading conversations...</p>
       ) : grouped.length === 0 ? (
         <p className={styles.empty}>
-          No conversations yet. Click <strong>Boost activity</strong> to generate a realistic negotiation round.
+          Initializing automated negotiation rounds...
         </p>
       ) : (
         <div className={styles.groups}>

@@ -19,10 +19,8 @@ function formatTime(value: string) {
 
 export default function LiveNegotiationFeed({ initialItems }: { initialItems: ActivityItem[] }) {
   const [items, setItems] = useState<ActivityItem[]>(initialItems);
-  const [refreshing, setRefreshing] = useState(false);
 
   async function refresh() {
-    setRefreshing(true);
     try {
       const res = await fetch("/api/activity", { cache: "no-store" });
       const json = await res.json();
@@ -30,7 +28,7 @@ export default function LiveNegotiationFeed({ initialItems }: { initialItems: Ac
         setItems(json.data?.items || []);
       }
     } finally {
-      setRefreshing(false);
+      // no-op
     }
   }
 
@@ -53,9 +51,7 @@ export default function LiveNegotiationFeed({ initialItems }: { initialItems: Ac
     <section className={styles.wrap}>
       <div className={styles.top}>
         <h3>Live negotiation feed</h3>
-        <button onClick={refresh} disabled={refreshing}>
-          {refreshing ? "Refreshing..." : "Refresh"}
-        </button>
+        <span className={styles.liveBadge}>Auto-updating</span>
       </div>
 
       {chats.length === 0 ? (
