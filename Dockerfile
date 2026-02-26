@@ -10,6 +10,8 @@ RUN npm ci
 # copy source and delete any old build artifacts
 COPY . .
 RUN rm -rf .next
+# set dummy MongoDB URI for build (won't connect, just needed for config parsing)
+ENV MONGODB_URI=mongodb://localhost:27017/build-placeholder
 RUN npm run build
 
 # runtime stage
