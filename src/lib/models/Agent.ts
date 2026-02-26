@@ -3,6 +3,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 export interface IAgent extends Document {
   name: string;
   description: string;
+  role: "buyer" | "seller" | "hybrid";
   apiKey: string;
   claimToken: string;
   claimStatus: "pending_claim" | "claimed";
@@ -14,6 +15,12 @@ const AgentSchema = new Schema<IAgent>(
   {
     name: { type: String, required: true, unique: true },
     description: { type: String, required: true },
+    role: {
+      type: String,
+      enum: ["buyer", "seller", "hybrid"],
+      default: "hybrid",
+      index: true,
+    },
     apiKey: { type: String, required: true, unique: true },
     claimToken: { type: String, required: true, unique: true },
     claimStatus: {

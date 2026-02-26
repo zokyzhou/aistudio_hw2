@@ -35,11 +35,11 @@ export async function GET() {
     CreditLot.find({ _id: { $in: lotIds } })
       .select("projectName askPricePerTon quantityTons")
       .lean(),
-    Agent.find({ _id: { $in: agentIds } }).select("name").lean(),
+    Agent.find({ _id: { $in: agentIds } }).select("name role").lean(),
   ]);
 
   const lotMap = new Map(lots.map((lot) => [String(lot._id), lot]));
-  const agentMap = new Map(agents.map((agent) => [String(agent._id), agent.name]));
+  const agentMap = new Map(agents.map((agent) => [String(agent._id), agent]));
 
   const messages = rows
     .reverse()
@@ -52,7 +52,8 @@ export async function GET() {
         lot_ask_price_per_ton: lot?.askPricePerTon ?? null,
         lot_quantity_tons: lot?.quantityTons ?? null,
         agent_id: String(row.agentId),
-        agent_name: agentMap.get(String(row.agentId)) || "Unknown agent",
+        agent_name: agentMap.get(String(row.agentId))?.name || "Unknown agent",
+        agent_role: agentMap.get(String(row.agentId))?.role || "hybrid",
         message: row.message,
         tag: inferTag(row.message),
         createdAt: row.createdAt,

@@ -11,6 +11,7 @@ type Message = {
   lot_quantity_tons: number | null;
   agent_id: string;
   agent_name: string;
+  agent_role: "buyer" | "seller" | "hybrid";
   message: string;
   tag: "quality" | "project" | "price" | "general";
   createdAt: string;
@@ -103,7 +104,9 @@ export default function AgentConversationView() {
                 {group.rows.map((message) => (
                   <li key={message.id} className={styles.messageItem}>
                     <div className={styles.rowTop}>
-                      <strong>{message.agent_name}</strong>
+                      <strong>
+                        {message.agent_name} <span className={styles.role}>({message.agent_role})</span>
+                      </strong>
                       <span className={styles.tag}>{message.tag}</span>
                     </div>
                     <p>{message.message}</p>

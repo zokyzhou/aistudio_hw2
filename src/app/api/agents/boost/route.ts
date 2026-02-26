@@ -2,6 +2,7 @@ import { connectDB } from "@/lib/db/mongodb";
 import Agent from "@/lib/models/Agent";
 import Bid from "@/lib/models/Bid";
 import CreditLot from "@/lib/models/CreditLot";
+import HumanDisclosure from "@/lib/models/HumanDisclosure";
 import NegotiationMessage from "@/lib/models/NegotiationMessage";
 import Trade from "@/lib/models/Trade";
 import { errorResponse, successResponse } from "@/lib/utils/api-helpers";
@@ -10,35 +11,55 @@ function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-const qualityPrompts = [
-  "Can you confirm verification quality and latest registry issuance?",
-  "Any notes on additionality risk or reversal buffer coverage?",
-  "What is the monitoring/reporting cadence for this project?",
-];
+async function ensureNamedDemoAgents() {
+  const buyerCandidate = await Agent.findOne({
+    name: { $in: ["Buyer Zack", "BuyerAgent1"] },
+  });
+  const sellerCandidate = await Agent.findOne({
+    name: { $in: ["Seller Nilson", "TestAgent2"] },
+  });
 
-const projectPrompts = [
-  "Can you share project geography and local co-benefit highlights?",
-  "Who is the project developer and which registry entry should we review?",
-  "Please clarify methodology version and project boundary details.",
-];
+  if (buyerCandidate) {
+    buyerCandidate.name = "Buyer Zack";
+    buyerCandidate.role = "buyer";
+    await buyerCandidate.save();
+  }
 
-const pricePrompts = [
-  "If we close today, can you move 5% on price?",
-  "Our target is slightly below ask; open to counter-offer?",
-  "We can commit full volume if pricing is adjusted by $0.5/ton.",
-];
+  if (sellerCandidate) {
+    sellerCandidate.name = "Seller Nilson";
+    sellerCandidate.role = "seller";
+    await sellerCandidate.save();
+  }
+
+  return { buyerCandidate, sellerCandidate };
+}
 
 export async function POST() {
   await connectDB();
 
-  const agents = await Agent.find({}).sort({ lastActive: -1 }).limit(8);
+  const { buyerCandidate, sellerCandidate } = await ensureNamedDemoAgents();
+
+  const agents = await Agent.find({}).sort({ lastActive: -1 }).limit(12);
   if (agents.length < 2) {
     return errorResponse("Not enough agents", "Create at least two agents first", 400);
   }
 
-  const seller = agents[0];
-  const buyerPool = agents.filter((a) => String(a._id) !== String(seller._id));
-  const buyer = pick(buyerPool);
+  const seller =
+    sellerCandidate || agents.find((a) => a.role === "seller") || agents[0];
+
+  const buyer =
+    buyerCandidate ||
+    agents.find((a) => a.role === "buyer" && String(a._id) !== String(seller._id)) ||
+    agents.find((a) => String(a._id) !== String(seller._id)) ||
+    agents[0];
+
+  if (String(seller._id) === String(buyer._id)) {
+    return errorResponse("Role conflict", "Need distinct buyer and seller agents", 409);
+  }
+
+  seller.role = "seller";
+  buyer.role = "buyer";
+  await Promise.all([seller.save(), buyer.save()]);
 
   let lot = await CreditLot.findOne({ sellerAgentId: seller._id, status: "open" }).sort({ createdAt: -1 });
   if (!lot) {
@@ -56,6 +77,20 @@ export async function POST() {
 
   const bidPrice = Number((lot.askPricePerTon - 0.3).toFixed(2));
 
+  const sellerBenchmark = await HumanDisclosure.findOne({
+    agentId: seller._id,
+    postType: "sold_disclosure",
+  })
+    .sort({ createdAt: -1 })
+    .lean();
+
+  const buyerBenchmark = await HumanDisclosure.findOne({
+    agentId: buyer._id,
+    postType: "buy_criteria",
+  })
+    .sort({ createdAt: -1 })
+    .lean();
+
   const bid = await Bid.create({
     lotId: lot._id,
     buyerAgentId: buyer._id,
@@ -68,22 +103,30 @@ export async function POST() {
     {
       lotId: lot._id,
       agentId: buyer._id,
-      message: pick(qualityPrompts),
+      message: `As buyer, I need quality confirmation: standard ${lot.standard}, vintage ${lot.vintageYear}, geography ${lot.geography}.`,
     },
     {
       lotId: lot._id,
       agentId: seller._id,
-      message: pick(projectPrompts),
+      message: `As seller, project info: ${lot.projectName} (${lot.standard} ${lot.vintageYear}) in ${lot.geography}, quantity ${lot.quantityTons} tons.`,
     },
     {
       lotId: lot._id,
       agentId: buyer._id,
-      message: `${pick(pricePrompts)} Current indication: $${bidPrice}/ton for ${lot.quantityTons} tons.`,
+      message: `Price inquiry from buyer: ask is $${lot.askPricePerTon}/ton. My bid is $${bidPrice}/ton for ${lot.quantityTons} tons.${
+        buyerBenchmark?.benchmarkPricePerTon
+          ? ` Buyer benchmark: $${buyerBenchmark.benchmarkPricePerTon}/ton on ${buyerBenchmark.benchmarkMarketplace}.`
+          : ""
+      }`,
     },
     {
       lotId: lot._id,
       agentId: seller._id,
-      message: `Accepted. Final terms: $${bidPrice}/ton for ${lot.quantityTons} tons. Proceeding to settlement.`,
+      message: `Seller response: accepted at $${bidPrice}/ton for ${lot.quantityTons} tons. ${
+        sellerBenchmark?.benchmarkPricePerTon
+          ? `Seller benchmark was $${sellerBenchmark.benchmarkPricePerTon}/ton on ${sellerBenchmark.benchmarkMarketplace}.`
+          : "Proceeding with current project valuation context."
+      }`,
     },
   ]);
 

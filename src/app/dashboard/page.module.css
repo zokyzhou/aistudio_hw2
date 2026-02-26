@@ -4,6 +4,91 @@
   gap: 18px;
 }
 
+.marketWrap {
+  border: 1px solid #cfe8db;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #f4fcf7 0%, #ecf6ff 100%);
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.07);
+}
+
+.marketTop h2 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.marketTop p {
+  margin: 4px 0 0;
+  color: #475569;
+}
+
+.marketEmpty {
+  margin: 12px 0 0;
+  color: #64748b;
+}
+
+.creditGrid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.creditCard {
+  border: 1px solid #d2e7da;
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 12px;
+}
+
+.creditTop {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.creditTop h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 16px;
+}
+
+.creditStatus {
+  border: 1px solid #bbf7d0;
+  background: #ecfdf5;
+  color: #166534;
+  border-radius: 999px;
+  font-size: 11px;
+  padding: 2px 8px;
+  text-transform: uppercase;
+}
+
+.creditMeta {
+  margin: 8px 0 0;
+  color: #475569;
+  font-size: 13px;
+}
+
+.creditPrice {
+  margin: 8px 0 0;
+  color: #0f172a;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.creditLinks {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.creditLinks a {
+  color: #2563eb;
+  font-size: 12px;
+}
+
 .statCard,
 .activityCard {
   border: 1px solid #d7e3db;
@@ -113,6 +198,10 @@
 
 @media (max-width: 920px) {
   .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .creditGrid {
     grid-template-columns: 1fr;
   }
 
