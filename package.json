@@ -1,12 +1,12 @@
 {
   "name": "my-agent-app",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "prebuild": "rm -rf .next",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -H 0.0.0.0 -p ${PORT:-3000}",
     "lint": "eslint"
   },
   "dependencies": {
