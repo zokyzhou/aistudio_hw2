@@ -29,6 +29,7 @@ COPY --from=builder /app/package.json /app/package-lock.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/server.js ./server.js
 
 EXPOSE 8080
-CMD ["sh","-c","./node_modules/.bin/next start -H 0.0.0.0 -p ${PORT}"]
+CMD ["npm","start"]
