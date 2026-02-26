@@ -1,0 +1,218 @@
+.wrap {
+  display: grid;
+  gap: 16px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  background: linear-gradient(120deg, #f3fcf5, #eefbf6, #f0f9ff);
+  border: 1px solid #cde9d8;
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.heading {
+  margin: 0;
+  font-size: 20px;
+}
+
+.sub {
+  margin: 4px 0 0;
+  color: #475569;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.refreshBtn {
+  border: 1px solid #065f46;
+  background: #065f46;
+  color: white;
+  border-radius: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.refreshBtn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.refreshBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #047857;
+}
+
+.toggleLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #334155;
+  font-size: 14px;
+}
+
+.pickers {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pickerLabel {
+  display: grid;
+  gap: 6px;
+  color: #334155;
+  font-size: 14px;
+}
+
+.select {
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 9px;
+  font-size: 14px;
+}
+
+.compareGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.agentCard {
+  border: 1px solid #d8e5dd;
+  border-radius: 14px;
+  padding: 14px;
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.agentCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.09);
+}
+
+.agentTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.agentTop h3 {
+  margin: 0;
+}
+
+.claimed,
+.pending {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  font-size: 12px;
+  padding: 4px 10px;
+  border: 1px solid;
+}
+
+.claimed {
+  color: #166534;
+  background: #dcfce7;
+  border-color: #86efac;
+}
+
+.pending {
+  color: #92400e;
+  background: #fef3c7;
+  border-color: #fcd34d;
+}
+
+.desc {
+  color: #334155;
+  margin: 8px 0 6px;
+}
+
+.last {
+  margin: 0;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.metrics {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  color: #0f172a;
+}
+
+.metrics li {
+  background: #f8fcfa;
+  border: 1px solid #dbe7df;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.metrics li:hover {
+  border-color: #a7e3c4;
+  transform: translateX(2px);
+}
+
+.diffCard {
+  border: 1px solid #cde9d8;
+  background: linear-gradient(160deg, #eefbf3 0%, #f4f9ff 100%);
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.diffCard h3 {
+  margin: 0 0 10px;
+}
+
+.diffGrid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.diffGrid div {
+  border: 1px solid #d2e7da;
+  border-radius: 10px;
+  background: white;
+  padding: 10px;
+}
+
+.diffGrid p {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+}
+
+.diffGrid strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 18px;
+}
+
+.empty {
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 16px;
+  color: #64748b;
+}
+
+@media (max-width: 880px) {
+  .compareGrid,
+  .pickers,
+  .diffGrid {
+    grid-template-columns: 1fr;
+  }
+}

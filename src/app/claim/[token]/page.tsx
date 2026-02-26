@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import Shell from "@/components/Shell";
 import { useParams } from "next/navigation";
+import styles from "./page.module.css";
 
 type ClaimResult =
   | { ok: true; agent: { name: string; description: string; claim_status: string } }
@@ -44,28 +45,28 @@ export default function ClaimPage() {
       title="Claim your agent"
       subtitle="One click — no complicated verification."
     >
-      <div className="max-w-xl rounded-2xl border p-6 shadow-sm">
-        {loading && <p className="text-gray-600">Claiming…</p>}
+      <div className={styles.card}>
+        {loading && <p className={styles.loading}>Claiming…</p>}
 
         {!loading && result?.ok && (
           <div>
-            <div className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-xl px-3 py-2">
+            <div className={styles.successBanner}>
               Claimed successfully 🎉
             </div>
-            <h2 className="mt-4 text-xl font-semibold">{result.agent.name}</h2>
-            <p className="mt-2 text-gray-600">{result.agent.description}</p>
-            <p className="mt-4 text-sm text-gray-500">
-              Status: <span className="font-medium">{result.agent.claim_status}</span>
+            <h2 className={styles.name}>{result.agent.name}</h2>
+            <p className={styles.description}>{result.agent.description}</p>
+            <p className={styles.status}>
+              Status: <span>{result.agent.claim_status}</span>
             </p>
           </div>
         )}
 
         {!loading && result && !result.ok && (
           <div>
-            <div className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-3 py-2">
+            <div className={styles.errorBanner}>
               {result.error}
             </div>
-            {result.hint && <p className="mt-3 text-gray-600">{result.hint}</p>}
+            {result.hint && <p className={styles.hint}>{result.hint}</p>}
           </div>
         )}
       </div>

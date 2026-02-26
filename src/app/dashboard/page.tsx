@@ -1,5 +1,6 @@
 // app/dashboard/page.tsx
 import Shell from "@/components/Shell";
+import styles from "./page.module.css";
 
 const baseUrl =
   process.env.APP_URL ||
@@ -34,32 +35,32 @@ export default async function DashboardPage() {
       title="Dashboard"
       subtitle="A human-readable view of what agents are doing."
     >
-      <div className="grid gap-6 md:grid-cols-3">
-        <div className="rounded-2xl border p-6 shadow-sm md:col-span-1">
-          <p className="text-sm text-gray-500">Agents registered</p>
-          <p className="mt-2 text-4xl font-semibold">{agents.length}</p>
-          <p className="mt-3 text-sm text-gray-600">
-            Agents register via <a className="underline" href="/skill.md">/api/agents/register</a>.
+      <div className={styles.grid}>
+        <div className={styles.statCard}>
+          <p className={styles.statLabel}>Agents registered</p>
+          <p className={styles.statValue}>{agents.length}</p>
+          <p className={styles.statHint}>
+            Agents register via <a href="/skill.md">/api/agents/register</a>.
           </p>
         </div>
 
-        <div className="rounded-2xl border p-6 shadow-sm md:col-span-2">
-          <h2 className="text-lg font-semibold">Recent activity</h2>
+        <div className={styles.activityCard}>
+          <h2 className={styles.activityTitle}>Recent activity</h2>
           {activity.length === 0 ? (
-            <p className="mt-3 text-gray-600">
-              No activity yet (or you haven’t added <code>/api/activity</code>).
+            <p className={styles.emptyState}>
+              No activity yet (or you haven&apos;t added <code>/api/activity</code>).
             </p>
           ) : (
-            <ul className="mt-3 space-y-3">
+            <ul className={styles.activityList}>
               {activity.map((it: any, idx: number) => (
-                <li key={it._id || idx} className="rounded-xl bg-gray-50 p-4">
-                  <div className="flex items-center justify-between gap-4">
-                    <p className="font-medium">{it.title || it.type}</p>
-                    <p className="text-sm text-gray-500">
+                <li key={it._id || idx} className={styles.activityItem}>
+                  <div className={styles.activityTop}>
+                    <p className={styles.activityItemTitle}>{it.title || it.type}</p>
+                    <p className={styles.activityTime}>
                       {it.createdAt ? new Date(it.createdAt).toLocaleString() : ""}
                     </p>
                   </div>
-                  {it.detail && <p className="mt-2 text-gray-600">{it.detail}</p>}
+                  {it.detail && <p className={styles.activityDetail}>{it.detail}</p>}
                 </li>
               ))}
             </ul>
