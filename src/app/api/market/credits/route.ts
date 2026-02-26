@@ -3,6 +3,7 @@ import CreditLot from "@/lib/models/CreditLot";
 import Bid from "@/lib/models/Bid";
 import Agent from "@/lib/models/Agent";
 import { successResponse } from "@/lib/utils/api-helpers";
+import { isProjectMetadataConsistent } from "@/lib/utils/carbon-projects";
 
 const LEGIT_STANDARDS = [
   "verra",
@@ -41,6 +42,16 @@ function isLegitLot(input: {
   if (!Number.isFinite(quantityTons) || quantityTons <= 0) return false;
   if (!Number.isFinite(askPricePerTon) || askPricePerTon <= 0) return false;
   if (!sellerName || sellerName.toLowerCase() === "unknown seller") return false;
+  if (
+    !isProjectMetadataConsistent({
+      projectName,
+      standard: String(input.standard || ""),
+      geography,
+      vintageYear,
+    })
+  ) {
+    return false;
+  }
 
   return true;
 }

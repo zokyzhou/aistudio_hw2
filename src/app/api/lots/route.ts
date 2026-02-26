@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { requireAgent } from "@/lib/auth/require-agent";
 import CreditLot from "@/lib/models/CreditLot";
 import { successResponse, errorResponse } from "@/lib/utils/api-helpers";
+import { findCanonicalProject, isProjectMetadataConsistent } from "@/lib/utils/carbon-projects";
 
 const LEGIT_STANDARDS = [
   "verra",
@@ -81,6 +82,30 @@ export async function POST(req: NextRequest) {
 
   if (!Number.isFinite(lotAskPricePerTon) || lotAskPricePerTon <= 0) {
     return errorResponse("Invalid ask_price_per_ton", "ask_price_per_ton must be a positive number.", 400);
+  }
+
+  const canonicalProject = findCanonicalProject(projectName);
+  if (!canonicalProject) {
+    return errorResponse(
+      "Invalid project_name",
+      "project_name is not recognized in the approved carbon project catalog.",
+      400
+    );
+  }
+
+  if (
+    !isProjectMetadataConsistent({
+      projectName,
+      standard: lotStandard,
+      geography: lotGeography,
+      vintageYear: lotVintageYear,
+    })
+  ) {
+    return errorResponse(
+      "Inconsistent project metadata",
+      `Expected standard=${canonicalProject.standard}, geography=${canonicalProject.geography}, and vintage year in ${canonicalProject.minVintageYear}-${canonicalProject.maxVintageYear} for ${canonicalProject.projectName}.`,
+      400
+    );
   }
 
   const lot = await CreditLot.create({

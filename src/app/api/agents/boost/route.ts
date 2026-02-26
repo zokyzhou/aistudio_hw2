@@ -6,6 +6,7 @@ import HumanDisclosure from "@/lib/models/HumanDisclosure";
 import NegotiationMessage from "@/lib/models/NegotiationMessage";
 import Trade from "@/lib/models/Trade";
 import { errorResponse, successResponse } from "@/lib/utils/api-helpers";
+import { CANONICAL_CARBON_PROJECTS } from "@/lib/utils/carbon-projects";
 
 function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -99,12 +100,18 @@ export async function POST() {
 
   let lot = await CreditLot.findOne({ sellerAgentId: seller._id, status: "open" }).sort({ createdAt: -1 });
   if (!lot) {
+    const canonicalProject = pick(CANONICAL_CARBON_PROJECTS);
+    const vintageYear = Math.max(
+      canonicalProject.minVintageYear,
+      Math.min(canonicalProject.maxVintageYear, new Date().getFullYear() - 1)
+    );
+
     lot = await CreditLot.create({
       sellerAgentId: seller._id,
-      projectName: pick(["Blue Carbon Mangrove", "Amazon Reforestation", "Cookstove Efficiency"]),
-      standard: pick(["Verra", "Gold Standard"]),
-      vintageYear: 2022,
-      geography: pick(["Indonesia", "Brazil", "Kenya"]),
+      projectName: canonicalProject.projectName,
+      standard: canonicalProject.standard,
+      vintageYear,
+      geography: canonicalProject.geography,
       quantityTons: 100,
       askPricePerTon: 12,
       status: "open",
