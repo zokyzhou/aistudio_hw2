@@ -18,16 +18,13 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 
-# only copy production deps and built output
-COPY --from=builder /app/package*.json ./
-# copy full node_modules then prune dev deps
-COPY --from=builder /app/node_modules ./node_modules
-RUN npm prune --production
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-
 # set NODE_ENV just in case
 ENV NODE_ENV=production
 
+# copy standalone output (includes server.js and minimal dependencies)
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
+
 EXPOSE 3000
-CMD ["npm","start"]
+CMD ["node","server.js"]
